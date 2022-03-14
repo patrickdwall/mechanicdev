@@ -2,7 +2,6 @@
     shopify/orders/create
     shopify/draft_orders/create
 {% endcomment %}
-
 {% if event.preview %}
   {% action "shopify" %}
     [
@@ -18,16 +17,13 @@
     ]
   {% endaction %}
 {% else %}
+  {% assign europe ="AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,GB,GF,GP,MQ,ME,YT,RE,MF,GI,AX,PM,GL,BL,SX,AW,CW,WF,PF,NC,TF,AI,BM,IO,VG,KY,FK,MS,PN,SH,GS,TC,AD,LI,MC,SM,VA,JE,GG,GI,CH" | split: ','%}
   {% for order in shop.orders.any.unshipped %}
     {% if order.financial_status == "refunded" %}
       {% continue %}
     {% endif %}
-
-    {% comment %}
-        Probably have to go through line items for this.
-        Do we want to define every country in the EU and compare on that?
-    {% endcomment %}
-    {% if order.location == 60913123400 && order.shippingAddress.countryCodeV2 == 'US' %}
+    {% if europe contains order.shippingAddress.countryCodeV2 %}
+    {% elseif order.location == 60913123400 %}
         {% action "shopify" %}
         [
             "post",
