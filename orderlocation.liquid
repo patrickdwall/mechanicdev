@@ -1,0 +1,46 @@
+{% comment %}
+    shopify/orders/create
+    shopify/draft_orders/create
+{% endcomment %}
+
+{% if event.preview %}
+  {% action "shopify" %}
+    [
+      "post",
+      "/admin/orders/1234567890/fulfillments.json",
+      {
+        "fulfillment": {
+          "location_id": 43038794,
+          "notify_customer": false,
+          "status": "success"
+        }
+      }
+    ]
+  {% endaction %}
+{% else %}
+  {% for order in shop.orders.any.unshipped %}
+    {% if order.financial_status == "refunded" %}
+      {% continue %}
+    {% endif %}
+
+    {% comment %}
+        Probably have to go through line items for this.
+        Do we want to define every country in the EU and compare on that?
+    {% endcomment %}
+    {% if order.location == 60913123400 && order.shippingAddress.countryCodeV2 == 'US' %}
+        {% action "shopify" %}
+        [
+            "post",
+            "/admin/orders/{{ order.id }}/fulfillments.json",
+            {
+            "fulfillment": {
+                "location_id": 43038794,
+                "notify_customer": false,
+                "status": "success"
+            }
+            }
+        ]
+        {% endaction %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
