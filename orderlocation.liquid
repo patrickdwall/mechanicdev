@@ -15,7 +15,7 @@
     {% if europe contains order.shippingAddress.countryCodeV2 %}
     {% else %}
       {% for fulfillment in order.fulfillments %}
-        {{ if fulfillment.location_id == 60913123400 }}
+        {% if fulfillment.location_id == 60913123400 %}
             {% action "shopify" %}
             [
                 "post",
