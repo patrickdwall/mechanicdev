@@ -7,6 +7,8 @@
   {% if event.preview %}
     {% assign draft_order = hash %}
     {% assign draft_order["admin_graphql_api_id"] = "gid://shopify/Order/1234567890" %}
+  {% else %}
+    {% assign draft_order["admin_graphql_api_id"] = draft_order.id %}
   {% endif %}
   {% if draft_order.financial_status != "refunded" %}
     {% if europe contains draft_order.shippingAddress.countryCodeV2 %}
@@ -14,7 +16,7 @@
         {% action "shopify" %}
         [
             "post",
-            "/admin/orders/{{ draft_order.admin_graphql_api_id }}/fulfillments.json",
+            "/admin/orders/{{ draft_order.id }}/fulfillments.json",
             {
             "fulfillment": {
                 "location_id": 43038794,
