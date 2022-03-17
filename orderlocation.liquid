@@ -1,33 +1,9 @@
 {% comment %}
     shopify/orders/create
-    shopify/draft_orders/create
 {% endcomment %}
 {% assign europe = "AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,GB,GF,GP,MQ,ME,YT,RE,MF,GI,AX,PM,GL,BL,SX,AW,CW,WF,PF,NC,TF,AI,BM,IO,VG,KY,FK,MS,PN,SH,GS,TC,AD,LI,MC,SM,VA,JE,GG,GI,CH" | split: ','%}
 
-{% if event.topic == "shopify/draft_orders/create" %}
-  {% if event.preview %}
-    {% assign draft_order = hash %}
-    {% assign draft_order["admin_graphql_api_id"] = "gid://shopify/Order/1234567890" %}
-  {% endif %}
-  {% if draft_order.financial_status != "refunded" %}
-    {% if europe contains draft_order.shippingAddress.countryCodeV2 %}
-    {% elseif draft_order.location == 60913123400 %}
-        {% action "shopify" %}
-        [
-            "post",
-            "/admin/orders/{{ draft_order.admin_graphql_api_id }}/fulfillments.json",
-            {
-            "fulfillment": {
-                "location_id": 43038794,
-                "notify_customer": false,
-                "status": "success"
-            }
-            }
-        ]
-        {% endaction %}
-    {% endif %}
-  {% endif %}
-{% elseif event.topic == "shopify/orders/create" %}
+{% if event.topic == "shopify/orders/create" %}
   {% if event.preview %}
     {% assign order = hash %}
     {% assign order["admin_graphql_api_id"] = "gid://shopify/Order/1234567890" %}
