@@ -16,7 +16,7 @@
         {% action "shopify" %}
         [
             "post",
-            "/admin/orders/{{ draft_order.id }}/fulfillments.json",
+            "/admin/orders/{{ draft_order.admin_graphql_api_id }}/fulfillments.json",
             {
             "fulfillment": {
                 "location_id": 43038794,
