@@ -1,27 +1,35 @@
 {% assign europe = "AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,GB,GF,GP,MQ,ME,YT,RE,MF,GI,AX,PM,GL,BL,SX,AW,CW,WF,PF,NC,TF,AI,BM,IO,VG,KY,FK,MS,PN,SH,GS,TC,AD,LI,MC,SM,VA,JE,GG,GI,CH" | split: ','%}
 
-{% if event.topic == "shopify/orders/create" %}
+{% if event.topic == "shopify/orders/updated" %}
   {% if event.preview %}
     {% assign order = hash %}
+    {% assign order["id"] = 1234567890 %}
     {% assign order["admin_graphql_api_id"] = "gid://shopify/Order/1234567890" %}
+    {% assign order["fulfillments"] = array %}
+    {% assign order["fulfillments"][0] = hash %}
+    {% assign order["fulfillments"][0]["id"] = 1234567890 %}
   {% else %}
     {% assign order["admin_graphql_api_id"] = order.id %}
   {% endif %}
   {% if order.financial_status != "refunded" %}
     {% if europe contains order.shippingAddress.countryCodeV2 %}
-    {% elsif order.location == 60913123400 %}
-        {% action "shopify" %}
-        [
-            "post",
-            "/admin/orders/{{ order.admin_graphql_api_id }}/fulfillments.json",
-            {
-            "fulfillment": {
-                "location_id": 43038794,
-                "notify_customer": false
-            }
-            }
-        ]
-        {% endaction %}
+    {% else %}
+      {% for fulfillment in order.fulfillments %}
+        {{ if fulfillment.location_id == 60913123400 }}
+            {% action "shopify" %}
+            [
+                "post",
+                "/admin/orders/{{ order.admin_graphql_api_id }}/fulfillments.json",
+                {
+                "fulfillment": {
+                    "location_id": 43038794,
+                    "notify_customer": false
+                }
+                }
+            ]
+            {% endaction %}
+        {% endif %}
+      {% endfor %}
     {% endif %}
   {% endif %}
 {% endif %}
